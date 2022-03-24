@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+
+set timeout -1
+
+#expect定义和接收参数方式和bash不一样
+set rootPassword [lindex $argv 0]
+set name [lindex $argv 1]
+set password [lindex $argv 2]
+
+
+#弹出mysql安全配置向导，全部Y
+spawn mysql -h localhost -P 3306 -u root -p
+
+#*结尾，如果有多行输出时可能提前返回，匹配字符串最好包括最后字符，中间用*号
+expect {
+
+"Enter password*" {send "${rootPassword}\r"}
+
+}
+
+expect {
+
+"*MariaDB*none*" {send "grant all on *.* to '$name'@'%' identified by '$password' with grant option;flush privileges;INSTALL SONAME 'ha_mroonga';exit;\r"}
+
+}
+
+expect eof

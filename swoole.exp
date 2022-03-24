@@ -1,0 +1,47 @@
+#!/usr/bin/expect
+
+set timeout -1
+
+spawn yum -y install make libcurl-devel c-ares-devel
+
+spawn pecl install swoole
+
+expect {
+
+"*enable sockets supports*" {send "no\r"}
+
+}
+
+expect {
+
+"*enable openssl support*" {send "yes\r"}
+
+}
+
+expect {
+
+"*enable http2 support*" {send "yes\r"}
+
+}
+
+expect {
+
+"*enable mysqlnd support*" {send "no\r"}
+
+}
+
+expect {
+
+"*enable json support*" {send "yes\r"}
+
+}
+
+expect {
+
+"*enable curl support*" {send "yes\r"}
+
+}
+
+spawn echo "extension=swoole" >> /etc/php.d/*sockets.ini
+
+expect eof
